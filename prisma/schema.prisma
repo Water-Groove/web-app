@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // url      = env("DATABASE_URL")
+}
+
+// =======================================
+// ENUMS
+// =======================================
+
+enum AdminRole {
+  ADMIN
+  SUPERADMIN
+}
+
+enum InvestorTier {
+  STARTER
+  GROWTH
+  PREMIUM
+  ELITE
+  EXECUTIVE
+}
+
+enum InvestmentStatus {
+  PENDING_PAYMENT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+  REJECTED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  INTEREST
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+// =======================================
+// MODELS
+// =======================================
+
+model User {
+  id       String  @id @default(uuid())
+  auth_Id  String  @unique
+  fullName String
+  email    String  @unique
+  phone    String? @unique
+  picture  String?
+
+  investmentCategoryId String?
+  investmentCategory   InvestmentCategory? @relation(fields: [investmentCategoryId], references: [id])
+
+  isActive Boolean @default(true)
+
+  investments  Investment[]
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Admin {
+  id           String    @id @default(uuid())
+  auth_Id      String    @unique
+  fullName     String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  approvedInvestments   Investment[]          @relation("ApprovedInvestments")
+  withdrawalPenalty     WithdrawalPenalty[]
+  processedTransactions Transaction[]         @relation("ProcessedTransactions")
+  platformBankAccounts  PlatformBankAccount[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model InvestmentCategory {
+  id String @id @default(uuid())
+
+  code     String @unique // STARTER, GROWTH, PREMIUM
+  name     String // Human readable
+  priority Int // ordering
+
+  minAmount Decimal  @db.Decimal(15, 2)
+  maxAmount Decimal? @db.Decimal(15, 2)
+
+  monthlyRoiRate Decimal @default(0.02) @db.Decimal(5, 2)
+  durationMonths Int // e.g. 18
+
+  description String?
+  isActive    Boolean @default(true)
+
+  investments Investment[]
+  users       User[] // current tier users
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([priority])
+}
+
+model Investment {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  categoryId String
+  category   InvestmentCategory @relation(fields: [categoryId], references: [id])
+
+  principalAmount Decimal @db.Decimal(15, 2)
+
+  roiRateSnapshot Decimal @db.Decimal(5, 2)
+  durationMonths  Int
+  lastRoiPeriodPaid Int @default(0)
+
+  status InvestmentStatus @default(PENDING_PAYMENT)
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  approvedByAdminId String?
+  approvedByAdmin   Admin?  @relation("ApprovedInvestments", fields: [approvedByAdminId], references: [id])
+
+  investorBalance InvestorBalance?
+  transactions    Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([categoryId])
+  @@index([status])
+}
+
+model InvestorBalance {
+  id String @id @default(uuid())
+
+  investmentId String     @unique
+  investment   Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+
+  principalLocked Decimal @db.Decimal(15, 2)
+  roiAccrued      Decimal @default(0) @db.Decimal(15, 2)
+  totalDeposited  Decimal @default(0) @db.Decimal(15, 2)
+  totalWithdrawn  Decimal @default(0) @db.Decimal(15, 2)
+
+  availableBalance Decimal @default(0) @db.Decimal(15, 2)
+
+  lastComputedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  investmentId String?
+  investment   Investment? @relation(fields: [investmentId], references: [id])
+
+  earlyWithdrawal Boolean           @default(false)
+  type            TransactionType
+  status          TransactionStatus @default(PENDING)
+
+  amount      Decimal @db.Decimal(15, 2)
+  proofUrl    String?
+  description String?
+
+  processedByAdminId String?
+  processedByAdmin   Admin?  @relation("ProcessedTransactions", fields: [processedByAdminId], references: [id])
+
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  withdrawalDetail  WithdrawalDetail?
+  withdrawalPenalty WithdrawalPenalty?
+
+  @@index([userId])
+  @@index([investmentId])
+  @@index([type])
+  @@index([status])
+}
+
+model WithdrawalPenalty {
+  id String @id @default(uuid())
+
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+
+  percentage Decimal @db.Decimal(5, 2) // e.g. 25.00
+  amount     Decimal @db.Decimal(15, 2)
+
+  reason String // "Early withdrawal before maturity"
+
+  appliedByAdminId String
+  appliedByAdmin   Admin  @relation(fields: [appliedByAdminId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([transactionId])
+}
+
+model WithdrawalDetail {
+  id String @id @default(uuid())
+
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  bankName          String
+  accountNumber     String
+  accountHolderName String
+  reference         String?
+
+  createdAt DateTime @default(now())
+}
+
+model PlatformBankAccount {
+  id String @id @default(uuid())
+
+  bankName          String
+  accountNumber     String
+  accountHolderName String
+
+  currency String @default("NGN")
+
+  isActive  Boolean @default(false)
+  isDefault Boolean @default(false)
+
+  createdByAdminId String?
+  createdByAdmin   Admin?  @relation(fields: [createdByAdminId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([isDefault])
+}
+
+model CronLock {
+  name String @id
+  lockedAt DateTime
+}
