@@ -24,7 +24,8 @@ import {
   Eye,
   Target,
   MessageCircle,
-  AlertCircle
+  AlertCircle,
+  Building
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -92,12 +93,14 @@ const ContactClient = () => {
   // Email address
   const EMAIL_ADDRESS = 'support@watergrooveinvestment.com';
 
+  // Updated Contact Information with Abuja addresses
   const contactInfo = [
     {
-      icon: <MapPin className="h-8 w-8" />,
-      title: 'Office Address',
-      details: ['123 Investment Plaza', 'Victoria Island', 'Lagos, Nigeria'],
-      color: 'from-blue-500/20 to-cyan-500/20'
+      icon: <Building className="h-8 w-8" />,
+      title: 'Gwaripa Office',
+      details: ['Suite S3, Bricks & More Plaza', 'Gwaripa', 'Abuja, Nigeria'],
+      color: 'from-blue-500/20 to-cyan-500/20',
+      type: 'headquarters'
     },
     {
       icon: <Phone className="h-8 w-8" />,
@@ -116,6 +119,22 @@ const ContactClient = () => {
       title: 'Working Hours',
       details: ['Monday - Friday: 8:00 AM - 6:00 PM', 'Saturday: 9:00 AM - 2:00 PM'],
       color: 'from-rose-500/20 to-pink-500/20'
+    }
+  ];
+
+  // Additional Office Addresses Section
+  const officeAddresses = [
+    {
+      title: 'Gwaripa Office (Headquarters)',
+      address: 'Suite S3, Bricks & More Plaza, Gwaripa, Abuja',
+      icon: <Building className="h-5 w-5" />,
+      color: 'bg-blue-100 text-blue-600'
+    },
+    {
+      title: 'Utako Office',
+      address: 'First floor left wing, main building, Ojimadu Nwaeze plaza, Solomon Lar Road, opposite Top Rank hotel Utako, Abuja',
+      icon: <MapPin className="h-5 w-5" />,
+      color: 'bg-emerald-100 text-emerald-600'
     }
   ];
 
@@ -497,10 +516,76 @@ const ContactClient = () => {
                         );
                       })}
                     </div>
+                    {info.type === 'headquarters' && (
+                      <span className="mt-2 inline-block px-2 py-1 text-xs bg-wg-secondary/10 text-wg-secondary rounded-full">
+                        Headquarters
+                      </span>
+                    )}
                   </div>
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Office Addresses Section */}
+      <section className="py-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-gradient-to-br from-wg-primary/5 to-wg-secondary/5 border border-wg-primary/20">
+              <CardHeader>
+                <CardTitle className="text-xl text-wg-primary flex items-center gap-2">
+                  <Building className="h-5 w-5" />
+                  Our Office Locations
+                </CardTitle>
+                <CardDescription className="text-wg-primary/70">
+                  Visit us at our convenient Abuja locations
+                </CardDescription>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {officeAddresses.map((office, index) => (
+                    <div 
+                      key={index}
+                      className="p-4 rounded-lg bg-white border border-wg-primary/10 hover:border-wg-accent/50 transition-all duration-300 hover:shadow-md"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-full ${office.color}`}>
+                          {office.icon}
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-wg-primary text-sm mb-1">
+                            {office.title}
+                          </h4>
+                          <p className="text-sm text-wg-primary/70 leading-snug">
+                            {office.address}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Map Link */}
+                <div className="mt-6 pt-6 border-t border-wg-primary/10">
+                  <p className="text-sm text-wg-primary/80 mb-3">
+                    Need directions to our offices?
+                  </p>
+                  <a 
+                    href="https://maps.google.com/?q=Gwaripa+Abuja+Nigeria"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-wg-accent hover:text-wg-secondary transition-colors text-sm font-medium"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    View on Google Maps
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

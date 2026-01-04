@@ -9,7 +9,8 @@ import {
   Phone,
   MapPin,
   Shield,
-  CheckCircle
+  CheckCircle,
+  Building
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -41,7 +42,7 @@ export function Footer() {
             </p>
 
             {/* Contact Details */}
-            <div className="space-y-3 pt-4">
+            <div className="space-y-4 pt-4">
               <div className="flex items-start gap-3">
                 <div className="mt-1">
                   <Phone className="h-4 w-4 text-wg-secondary" />
@@ -72,16 +73,33 @@ export function Footer() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="mt-1">
-                  <MapPin className="h-4 w-4 text-wg-secondary" />
+              {/* Updated Office Addresses */}
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="mt-1">
+                    <Building className="h-4 w-4 text-wg-secondary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-wg-primary">Gwaripa Office (Headquarters)</p>
+                    <p className="text-sm text-wg-primary/80 leading-snug">
+                      Suite S3, Bricks & More Plaza<br />
+                      Gwaripa, Abuja
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-wg-primary">Office Address</p>
-                  <p className="text-sm text-wg-primary/80">
-                    Water Grove Investment Headquarters<br />
-                    Lagos, Nigeria
-                  </p>
+
+                <div className="flex items-start gap-3">
+                  <div className="mt-1">
+                    <MapPin className="h-4 w-4 text-wg-secondary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-wg-primary">Utako Office</p>
+                    <p className="text-sm text-wg-primary/80 leading-snug">
+                      First floor left wing, Main Building<br />
+                      Ojimadu Nwaeze Plaza, Solomon Lar Road<br />
+                      Opposite Top Rank Hotel Utako, Abuja
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
