@@ -3,7 +3,8 @@ import { decodeJwt } from 'jose';
 import { AppRole } from '@/lib/auth/roles';
 import { createAdminFromAuth0, createUserFromAuth0 } from './createUserFromAuth0';
 
-const ROLE_NAMESPACE = 'https://api.watergroove.com/roles';
+const audiwnceUrl = process.env.AUTH0_AUDIENCE;
+const ROLE_NAMESPACE = `${audiwnceUrl}/roles`;
 
 export interface ServerAuthContext {
   user: any | null;
