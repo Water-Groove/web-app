@@ -3,7 +3,7 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   MapPin, 
@@ -23,7 +23,8 @@ import {
   ChevronRight,
   Eye,
   Target,
-  MessageCircle
+  MessageCircle,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,14 +32,40 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 // EmailJS configuration - Make sure these are set in your .env.local file
-const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
+const EMAILJS_TEMPLATE_ID_ADMIN = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID_ADMIN || '';
+const EMAILJS_TEMPLATE_ID_USER = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID_USER || '';
+const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '';
+
+// Type declarations for EmailJS
+declare global {
+  interface Window {
+    emailjs?: {
+      send: (serviceId: string, templateId: string, templateParams: any) => Promise<{ status: number; text: string }>;
+      init: (publicKey: string) => void;
+    };
+  }
+}
+
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
+
+interface Particle {
+  left: number;
+  top: number;
+  size: number;
+}
 
 const ContactClient = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     phone: '',
@@ -48,9 +75,11 @@ const ContactClient = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const [isEmailJSLoaded, setIsEmailJSLoaded] = useState(false);
   const [emailJSError, setEmailJSError] = useState<string | null>(null);
+  const [emailJSStatus, setEmailJSStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle');
+  
+  const emailJSScriptRef = useRef<HTMLScriptElement | null>(null);
 
   // WhatsApp contact info
   const WHATSAPP_NUMBER = '2348035026480'; // Remove leading zero and country code
@@ -122,7 +151,7 @@ const ContactClient = () => {
   ];
 
   // Fixed floating particle positions
-  const fixedParticles = [
+  const fixedParticles: Particle[] = [
     { left: 10, top: 20, size: 8 },
     { left: 25, top: 60, size: 12 },
     { left: 40, top: 30, size: 10 },
@@ -138,19 +167,33 @@ const ContactClient = () => {
   ];
 
   useEffect(() => {
-    setIsClient(true);
-    
     // Check if EmailJS is configured
-    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+    const isEmailJSConfigured = EMAILJS_SERVICE_ID && 
+                               EMAILJS_TEMPLATE_ID_ADMIN && 
+                               EMAILJS_TEMPLATE_ID_USER && 
+                               EMAILJS_PUBLIC_KEY;
+    
+    if (!isEmailJSConfigured) {
       console.warn('EmailJS is not configured. Check your .env.local file.');
+      setEmailJSStatus('error');
       setEmailJSError('EmailJS is not configured. Contact form will use fallback.');
       return;
     }
+
+    // Check if script is already loaded
+    if (window.emailjs) {
+      setIsEmailJSLoaded(true);
+      setEmailJSStatus('loaded');
+      return;
+    }
+
+    setEmailJSStatus('loading');
     
     // Load EmailJS script
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
     script.async = true;
+    script.id = 'emailjs-script';
     
     script.onload = () => {
       // Initialize EmailJS
@@ -158,28 +201,34 @@ const ContactClient = () => {
         try {
           window.emailjs.init(EMAILJS_PUBLIC_KEY);
           setIsEmailJSLoaded(true);
+          setEmailJSStatus('loaded');
           setEmailJSError(null);
           console.log('EmailJS loaded successfully');
         } catch (error) {
           console.error('EmailJS initialization failed:', error);
+          setEmailJSStatus('error');
           setEmailJSError('EmailJS initialization failed');
         }
       } else {
         console.error('EmailJS library not found');
+        setEmailJSStatus('error');
         setEmailJSError('EmailJS library failed to load');
       }
     };
     
     script.onerror = () => {
       console.error('Failed to load EmailJS script');
+      setEmailJSStatus('error');
       setEmailJSError('Failed to load EmailJS script');
     };
     
     document.head.appendChild(script);
+    emailJSScriptRef.current = script;
     
     return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
+      // Clean up script if component unmounts
+      if (emailJSScriptRef.current && document.head.contains(emailJSScriptRef.current)) {
+        document.head.removeChild(emailJSScriptRef.current);
       }
     };
   }, []);
@@ -201,51 +250,70 @@ const ContactClient = () => {
         minute: '2-digit',
       });
       
+      // Template parameters
+      const templateParams = {
+        name: formData.name,
+        time: formattedTime,
+        message: formData.message,
+        email: formData.email,
+        phone: formData.phone || 'Not provided',
+        subject: formData.subject || 'No subject provided'
+      };
+      
+      console.log('Attempting to send email...', {
+        emailJSLoaded: isEmailJSLoaded,
+        emailJSStatus,
+        hasConfig: !!EMAILJS_SERVICE_ID
+      });
+      
       // If EmailJS is configured and loaded, use it
-      if (isEmailJSLoaded && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
-        console.log('Attempting to send email via EmailJS...');
+      if (isEmailJSLoaded && window.emailjs && EMAILJS_SERVICE_ID) {
+        console.log('Sending via EmailJS...');
         
-        // Match the template variables exactly as in your email template
-        const templateParams = {
-          name: formData.name,
-          time: formattedTime,
-          message: formData.message,
-          email: formData.email,
-          phone: formData.phone || 'Not provided',
-          subject: formData.subject || 'No subject provided'
-        };
-        
-        console.log('Template params:', templateParams);
-        
-        const result = await window.emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          templateParams
-        );
-        
-        console.log('EmailJS result:', result);
-        
-        if (result.status === 200) {
-          console.log('Email sent successfully');
-        } else {
-          throw new Error(`EmailJS returned status: ${result.status}`);
+        try {
+          // Send to admin
+          const result = await window.emailjs.send(
+            EMAILJS_SERVICE_ID,
+            EMAILJS_TEMPLATE_ID_ADMIN,
+            templateParams
+          );
+          
+          console.log('EmailJS send result:', result);
+          
+          if (result.status === 200) {
+            // Send confirmation to user
+            try {
+              await window.emailjs.send(
+                EMAILJS_SERVICE_ID,
+                EMAILJS_TEMPLATE_ID_USER,
+                templateParams
+              );
+              console.log('Confirmation email sent to user');
+            } catch (userError) {
+              console.warn('Failed to send confirmation to user:', userError);
+              // Continue even if user confirmation fails
+            }
+          } else {
+            throw new Error(`EmailJS returned status ${result.status}`);
+          }
+          
+        } catch (emailJSError) {
+          console.error('EmailJS send failed:', emailJSError);
+          throw emailJSError;
         }
       } else {
-        // Fallback to console log and simulate success
+        // Fallback - log to console
         console.warn('EmailJS not available, using fallback');
-        console.log('Contact form submission:', {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          subject: formData.subject,
-          message: formData.message,
-          time: formattedTime
-        });
+        console.log('Contact form submission (fallback):', templateParams);
         
-        // Simulate API call
+        // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Show fallback warning
+        setEmailJSError('Email service is in testing mode. Your message was logged but not sent. For immediate assistance, please use WhatsApp or call us directly.');
       }
       
+      // Success
       setIsSubmitting(false);
       setIsSubmitted(true);
       
@@ -259,27 +327,29 @@ const ContactClient = () => {
           subject: '',
           message: '',
         });
+        setEmailJSError(null);
       }, 5000);
       
     } catch (error: any) {
-      console.error('Error sending email:', error);
+      console.error('Error in contact form:', error);
       setIsSubmitting(false);
       
-      // Provide more specific error messages
+      // User-friendly error messages
       let errorMessage = 'There was an error sending your message. Please try again or contact us directly.';
       
-      if (error?.status === 0) {
+      if (error?.status === 0 || error?.message?.includes('Network')) {
         errorMessage = 'Network error. Please check your internet connection and try again.';
-      } else if (error?.text?.includes('Invalid template ID')) {
+      } else if (error?.text?.includes('Invalid template')) {
         errorMessage = 'Email template configuration error. Please contact support.';
-      } else if (error?.text?.includes('Invalid service ID')) {
+      } else if (error?.text?.includes('Invalid service')) {
         errorMessage = 'Email service configuration error. Please contact support.';
       } else if (error?.text?.includes('Invalid public key')) {
         errorMessage = 'Email service authentication error. Please contact support.';
+      } else if (error?.message) {
+        errorMessage = error.message;
       }
       
       setEmailJSError(errorMessage);
-      alert(errorMessage);
     }
   };
 
@@ -300,6 +370,12 @@ const ContactClient = () => {
     window.open(`${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
+  // Check if EmailJS is properly configured
+  const isEmailJSConfigured = EMAILJS_SERVICE_ID && 
+                             EMAILJS_TEMPLATE_ID_ADMIN && 
+                             EMAILJS_TEMPLATE_ID_USER && 
+                             EMAILJS_PUBLIC_KEY;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-wg-neutral via-white to-wg-primary/5">
       {/* Hero Section */}
@@ -308,24 +384,22 @@ const ContactClient = () => {
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-wg-secondary via-wg-accent to-wg-secondary"></div>
         
         {/* Floating particles */}
-        {isClient && (
-          <div className="absolute inset-0 overflow-hidden">
-            {fixedParticles.map((particle, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full bg-wg-accent/10 animate-float"
-                style={{
-                  left: `${particle.left}%`,
-                  top: `${particle.top}%`,
-                  width: `${particle.size}px`,
-                  height: `${particle.size}px`,
-                  animationDelay: `${i * 0.5}s`,
-                  animationDuration: `${10 + (i % 5) * 2}s`,
-                }}
-              />
-            ))}
-          </div>
-        )}
+        <div className="absolute inset-0 overflow-hidden">
+          {fixedParticles.map((particle, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full bg-wg-accent/10 animate-float"
+              style={{
+                left: `${particle.left}%`,
+                top: `${particle.top}%`,
+                width: `${particle.size}px`,
+                height: `${particle.size}px`,
+                animationDelay: `${i * 0.5}s`,
+                animationDuration: `${10 + (i % 5) * 2}s`,
+              }}
+            />
+          ))}
+        </div>
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-5xl mx-auto text-center">
@@ -447,25 +521,22 @@ const ContactClient = () => {
                 
                 <CardContent>
                   {/* EmailJS Status Warning */}
+                  {!isEmailJSConfigured && (
+                    <Alert className="mb-6 bg-amber-50 border-amber-200">
+                      <AlertCircle className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-700">
+                        Email service is not configured. For immediate assistance, please use WhatsApp or call us directly.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
                   {emailJSError && !isSubmitted && (
-                    <div className="mb-6 p-4 rounded-lg bg-amber-50 border border-amber-200">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 rounded-full bg-amber-100">
-                          <Mail className="h-5 w-5 text-amber-600" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-amber-800 mb-1">Note:</h4>
-                          <p className="text-amber-700 text-sm">
-                            {emailJSError.includes('not configured') 
-                              ? 'Email service is in testing mode. Your message will be logged but not sent.'
-                              : emailJSError}
-                          </p>
-                          <p className="text-amber-600 text-xs mt-2">
-                            For immediate assistance, please use WhatsApp or call us directly.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    <Alert className="mb-6 bg-amber-50 border-amber-200">
+                      <AlertCircle className="h-4 w-4 text-amber-600" />
+                      <AlertDescription className="text-amber-700">
+                        {emailJSError}
+                      </AlertDescription>
+                    </Alert>
                   )}
                   
                   {isSubmitted ? (
@@ -511,6 +582,7 @@ const ContactClient = () => {
                               placeholder="John Doe"
                               className="pl-10 bg-white border-wg-primary/20 text-wg-primary focus:border-wg-accent"
                               required
+                              disabled={isSubmitting}
                             />
                           </div>
                         </div>
@@ -530,6 +602,7 @@ const ContactClient = () => {
                               placeholder="john@example.com"
                               className="pl-10 bg-white border-wg-primary/20 text-wg-primary focus:border-wg-accent"
                               required
+                              disabled={isSubmitting}
                             />
                           </div>
                         </div>
@@ -548,6 +621,7 @@ const ContactClient = () => {
                             onChange={handleChange}
                             placeholder="+234 803 502 6480"
                             className="pl-10 bg-white border-wg-primary/20 text-wg-primary focus:border-wg-accent"
+                            disabled={isSubmitting}
                           />
                         </div>
                       </div>
@@ -564,6 +638,7 @@ const ContactClient = () => {
                           placeholder="What is this regarding?"
                           className="bg-white border-wg-primary/20 text-wg-primary focus:border-wg-accent"
                           required
+                          disabled={isSubmitting}
                         />
                       </div>
                       
@@ -579,6 +654,7 @@ const ContactClient = () => {
                           placeholder="Please provide details about your inquiry..."
                           className="min-h-[150px] bg-white border-wg-primary/20 text-wg-primary focus:border-wg-accent"
                           required
+                          disabled={isSubmitting}
                         />
                       </div>
                       
@@ -588,6 +664,7 @@ const ContactClient = () => {
                           id="privacy"
                           className="rounded border-wg-primary/20 text-wg-primary focus:ring-wg-primary"
                           required
+                          disabled={isSubmitting}
                         />
                         <Label htmlFor="privacy" className="text-sm text-wg-primary/70">
                           I agree to the privacy policy and terms of service
@@ -596,7 +673,7 @@ const ContactClient = () => {
                       
                       <Button
                         type="submit"
-                        className="w-full bg-wg-primary hover:bg-wg-primary/90 text-wg-neutral font-bold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                        className="w-full bg-wg-primary hover:bg-wg-primary/90 text-wg-neutral font-bold py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={isSubmitting}
                       >
                         {isSubmitting ? (
@@ -854,12 +931,5 @@ const ContactClient = () => {
     </div>
   );
 };
-
-// Add EmailJS types to window
-declare global {
-  interface Window {
-    emailjs: any;
-  }
-}
 
 export default ContactClient;
