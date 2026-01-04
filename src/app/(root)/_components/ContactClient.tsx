@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable react/no-unescaped-entities */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -34,7 +31,8 @@ import { Badge } from '@/components/ui/badge';
 
 // EmailJS configuration - Make sure these are set in your .env.local file
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+const EMAILJS_TEMPLATE_ID_ADMIN = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID_ADMIN;
+const EMAILJS_TEMPLATE_ID_USER = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID_USER;
 const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
 const ContactClient = () => {
@@ -141,7 +139,7 @@ const ContactClient = () => {
     setIsClient(true);
     
     // Check if EmailJS is configured
-    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID_ADMIN || !EMAILJS_TEMPLATE_ID_USER || !EMAILJS_PUBLIC_KEY) {
       console.warn('EmailJS is not configured. Check your .env.local file.');
       setEmailJSError('EmailJS is not configured. Contact form will use fallback.');
       return;
@@ -202,7 +200,7 @@ const ContactClient = () => {
       });
       
       // If EmailJS is configured and loaded, use it
-      if (isEmailJSLoaded && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+      if (isEmailJSLoaded && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID_USER && EMAILJS_TEMPLATE_ID_ADMIN) {
         console.log('Attempting to send email via EmailJS...');
         
         // Match the template variables exactly as in your email template
@@ -215,21 +213,29 @@ const ContactClient = () => {
           subject: formData.subject || 'No subject provided'
         };
         
-        console.log('Template params:', templateParams);
-        
-        const result = await window.emailjs.send(
+        // console.log('Template params:', templateParams);
+        try {
+          const result = await window.emailjs.send(
           EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
+          EMAILJS_TEMPLATE_ID_ADMIN,
           templateParams
         );
-        
-        console.log('EmailJS result:', result);
-        
-        if (result.status === 200) {
-          console.log('Email sent successfully');
-        } else {
-          throw new Error(`EmailJS returned status: ${result.status}`);
+        console.log('EmailJS send result:', result);  
+        if (result.status===200) {
+          await window.emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID_USER,
+          templateParams
+        );
         }
+        
+        } catch (error) {
+          console.error('EmailJS send failed:', error);
+        }
+        
+        
+      
+       
       } else {
         // Fallback to console log and simulate success
         console.warn('EmailJS not available, using fallback');

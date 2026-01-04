@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import InvestmentSectorsClient from '@/app/(root)/investment-sectors/_components/InvestmentSectorsClient';
+import InvestmentSectorsClient from '@/app/(root)/_components/InvestmentSectorsClient';
 
 export const metadata: Metadata = {
   title: "Investment Categories | WG",

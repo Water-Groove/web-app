@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import InvestmentDisclaimerClient from './_components/InvestmentDisclaimerClient';
+import InvestmentDisclaimerClient from '../_components/InvestmentDisclaimerClient';
 
 export const metadata: Metadata = {
   title: "Investment Disclaimer | WG",

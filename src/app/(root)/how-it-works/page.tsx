@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-import HowItWorksClient from '@/app/(root)/how-it-works/_components/HowItWorksClient';
+import HowItWorksClient from '@/app/(root)/_components/HowItWorksClient';
 
 export const metadata: Metadata = {
   title: "How It Works | WG",
