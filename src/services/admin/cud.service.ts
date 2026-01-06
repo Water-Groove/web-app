@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { resolveServerAuth } from "@/lib/server/auth0-server";
 import { ApiResponse, InvestmenCrontDto } from "@/types/type"
 import { InvestmentStatus, TransactionStatus, TransactionType } from "@prisma/client";
+import { notificationService } from "../notification/notification.service";
 
 async function authorizeAdmin(adminId: string) {
   const authAdmin = await resolveServerAuth()
@@ -18,7 +19,7 @@ export async function approveDeposit(txnId: string, adminId: string): Promise<Ap
   const now = new Date();
 
   try {
-    await prisma.$transaction(async (tx) => {
+    const x = await prisma.$transaction(async (tx) => {
 
       const txn = await tx.transaction.update({
         where: { id: txnId },
@@ -52,7 +53,11 @@ export async function approveDeposit(txnId: string, adminId: string): Promise<Ap
           updatedAt: new Date(),
         },
       })
+      return txn
     });
+
+    await notificationService.sendApproveDepositNotification({ userId: x?.userId, transactionId: x?.id })
+
 
     return {
       success: true,
@@ -76,7 +81,7 @@ export async function rejectDeposit(txnId: string, adminId: string): Promise<Api
     success: false, message: "adminId or txnId is missing", data: null
   }
   try {
-    await prisma.transaction.update({
+    const x = await prisma.transaction.update({
       where: { id: txnId },
       data: {
         status: TransactionStatus.REJECTED,
@@ -85,6 +90,8 @@ export async function rejectDeposit(txnId: string, adminId: string): Promise<Api
         updatedAt: new Date()
       },
     })
+
+    await notificationService.sendRejectDepositNotification({ userId: x?.userId, transactionId: x?.id })
 
     return {
       success: true,
@@ -117,7 +124,7 @@ export async function approveWithdrawal(
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    const x = await prisma.$transaction(async (tx) => {
 
       // 1️⃣ Fetch transaction
       const txn = await tx.transaction.findUnique({
@@ -229,7 +236,12 @@ export async function approveWithdrawal(
           updatedAt: new Date()
         },
       });
+
+      return txn
     });
+
+    await notificationService.sendApproveWithdrawalNotification({ userId: x?.userId, transactionId: x?.id })
+
 
     return {
       success: true,
@@ -255,7 +267,7 @@ export async function rejectWithdrawal(txnId: string, adminId: string): Promise<
     success: false, message: "adminId or txnId is missing", data: null
   }
   try {
-    await prisma.transaction.update({
+    const x = await prisma.transaction.update({
       where: { id: txnId },
       data: {
         status: TransactionStatus.REJECTED,
@@ -264,6 +276,9 @@ export async function rejectWithdrawal(txnId: string, adminId: string): Promise<
         updatedAt: new Date()
       },
     })
+
+    await notificationService.sendRejectWithdrawalNotification({ userId: x?.userId, transactionId: x?.id })
+
 
     return {
       success: true,
@@ -287,7 +302,7 @@ export async function paidWithdrawal(txnId: string, adminId: string): Promise<Ap
     success: false, message: "adminId or txnId is missing", data: null
   }
   try {
-    await prisma.transaction.update({
+    const x = await prisma.transaction.update({
       where: { id: txnId },
       data: {
         status: TransactionStatus.PAID,
@@ -296,6 +311,7 @@ export async function paidWithdrawal(txnId: string, adminId: string): Promise<Ap
         updatedAt: new Date()
       },
     })
+    await notificationService.sendPaidWithdrawalNotification({ userId: x?.userId, transactionId: x?.id })
 
     return {
       success: true,
@@ -436,23 +452,5 @@ export async function roiCronService(
       message: error?.message || "Failed to credit ROI",
       data: null,
     };
-  }
-}
-
-export async function change(data: any): Promise<ApiResponse<null>> {
-  try {
-
-    return {
-      success: true,
-      message: '',
-      data: data
-    }
-  } catch (error: any) {
-    console.error(error)
-    return {
-      success: false,
-      message: error.message,
-      data: null
-    }
   }
 }

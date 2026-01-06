@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreVertical, Eye, FileText, Download } from "lucide-react";
-import { AdminTransactionRow } from "@/types/adminType";
+import { AdminTransactionRow } from "@/types/admin.type";
 import { TransactionStatus, TransactionType } from "@prisma/client";
 import { formatCurrency, formatDate } from "@/lib/utils";
 

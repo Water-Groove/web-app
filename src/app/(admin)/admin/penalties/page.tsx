@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { getAllPenalties } from "@/services/admin/r.service";
 import PenaltiesClient from "../_components/PenaltiesClient";
 import { resolveServerAuth } from "@/lib/server/auth0-server";
-import { AdminPenaltiesQueryParams } from "@/types/adminType";
+import { AdminPenaltiesQueryParams } from "@/types/admin.type";
 
 export const metadata: Metadata = {
   title: "Penalties Management | Water Groove Admin",

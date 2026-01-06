@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { Metadata } from "next";
 import { getAdminDashboardOverview } from "@/services/admin/r.service";
 import AdminDashboardClient from "../_components/AdminDashboardClient";
-import { AdminDashboardOverview } from "@/types/adminType";
+import { AdminDashboardOverview } from "@/types/admin.type";
 import { resolveServerAuth } from "@/lib/server/auth0-server";
 
 export const dynamic = 'force-dynamic';

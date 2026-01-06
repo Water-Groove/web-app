@@ -7,7 +7,9 @@ import {
   AdminInvestmentRow,
   AdminUserRow,
   AdminPenaltyRow
-} from "@/types/adminType"
+} from "@/types/admin.type"
+import { EmailTransactionDetail } from "@/types/notification.type";
+
 
 export const decimalToNumber = (
   value?: Prisma.Decimal | null
@@ -330,5 +332,36 @@ export function mapPeneltyToAdminRow(
     amount: Number(penalty.amount),
     reason: penalty.reason ?? "",
     createdAt: penalty.createdAt
+  }
+}
+
+const trasactionSelect = {
+  id: true,
+  investmentId: true,
+  type: true,
+  status: true,
+  amount: true,
+  description: true,
+  processedByAdminId: true,
+  processedAt: true,
+  createdAt: true,
+}
+type TransactionSelectNoti = Prisma.TransactionGetPayload<{
+  select: typeof trasactionSelect
+}>
+
+export function mapTransactionToEmailDetail(
+  txn:  TransactionSelectNoti
+): EmailTransactionDetail {
+  return {
+    id: txn.id,
+    investmentId: txn.investmentId ?? "",
+    type: txn.type,
+    status: txn.status,
+    amount: Number(txn.amount),
+    description: txn.description ?? "",
+    processedByAdminId: txn.processedByAdminId ?? "",
+    processedAt: txn.processedAt,
+    createdAt: txn.createdAt,
   }
 }

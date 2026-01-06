@@ -1,5 +1,5 @@
 import { InvestorTier, TransactionStatus, TransactionType, AdminRole, InvestmentStatus } from "@prisma/client"
-import { AdminTransactionRow } from "./adminType"
+import { AdminTransactionRow } from "./admin.type"
 import build from "next/dist/build"
 
 export enum InvestmentStatusDto {

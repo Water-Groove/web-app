@@ -60,7 +60,7 @@ import {
   Loader2,
   ExternalLink
 } from 'lucide-react';
-import { SupportTicket, SupportTicketStatus, SupportTicketPriority, SupportMessage } from '@/types/support';
+import { SupportTicket, SupportTicketStatus, SupportTicketPriority, SupportMessage } from '@/types/support.type';
 import { ApiResponse, PaginatedResponse } from '@/types/type';
 
 interface SupportClientProps {

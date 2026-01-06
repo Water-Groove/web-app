@@ -33,7 +33,7 @@ import { TransactionStatus, TransactionType } from "@prisma/client";
 import { DateRange } from "react-day-picker";
 import TransactionTable from "@/components/transaction/TransactionTable";
 import TransactionDetailsModal from "@/components/transaction/TransactionDetailsModal";
-import { AdminTransactionRow, PaginatedResponse } from "@/types/adminType";
+import { AdminTransactionRow, PaginatedResponse } from "@/types/admin.type";
 
 interface TransactionClientProps {
   initialTransactions: AdminTransactionRow[];
