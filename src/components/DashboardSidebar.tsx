@@ -111,7 +111,7 @@ export function DashboardSidebar({
             const Icon = item.icon;
 
             return (
-              <>
+              <div key={item.href}>
                 {item.title === "Support" ? (
                   <Button
                     key={item.href}
@@ -145,7 +145,7 @@ export function DashboardSidebar({
                     <span className="font-medium">{item.title}</span>
                   </Link>
                 )}
-              </>
+              </div>
             );
           })}
         </nav>

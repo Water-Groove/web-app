@@ -48,7 +48,7 @@ export type EmailUser = {
 };
 
 export type EmailTransactionDetail = {
-  reference: string;
+  reference?: string;
   id: string;
   investmentId: string | null;
   type: string;

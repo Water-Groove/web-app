@@ -1,0 +1,10 @@
+Postgis setup for db
+
+restore
+psql "postgresql://neondb_owner:npg_ZKYojP7iRVT0@ep-delicate-resonance-ab2i3bc7-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require" < water_groove_neon_db_backup.sql
+psql "postgresql://watergroove_user:watergoover256@localhost:5432/water_groove" < water_groove_db_backup.sql
+
+
+dump
+pg_dump "postgresql://neondb_owner:npg_ZKYojP7iRVT0@ep-delicate-resonance-ab2i3bc7-pooler.eu-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require" > water_groove_neon_db_backup.sql
+pg_dump "postgresql://watergroove_user:watergoover256@localhost:5432/water_groove" > water_groove_db_backup.sql

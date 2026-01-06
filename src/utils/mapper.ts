@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { Admin, Investment, InvestorBalance, InvestmentCategory, PlatformBankAccount, Transaction, User } from "@prisma/client"
 import { Prisma } from "@prisma/client"
-import { AdminDto, BankDetails, InvestmenCrontDto, InvestorBalanceDto, CategoryDto, InvestmentDto, InvestmentWithCategoryDto, TransactionDto, UserDto, UserProfileSettings } from "@/types/type"
+import { AdminDto, BankDetails, InvestmenCrontDto, InvestorBalanceDto, CategoryDto, InvestmentDto, InvestmentWithCategoryDto, TransactionDto, UserDto, UserProfileSettings, InvestorBalancesDto } from "@/types/type"
 import {
   AdminTransactionRow,
   AdminInvestmentRow,
@@ -363,5 +363,38 @@ export function mapTransactionToEmailDetail(
     processedByAdminId: txn.processedByAdminId ?? "",
     processedAt: txn.processedAt,
     createdAt: txn.createdAt,
+  }
+}
+
+
+const investorBalanceSelect = {
+  id: true,
+  investmentId: true,
+  principalLocked: true,
+  roiAccrued: true,
+  totalDeposited: true,
+  totalWithdrawn: true,
+  availableBalance: true,
+  lastComputedAt: true,
+  createdAt: true,
+}
+type InvestorBalanceSelect = Prisma.InvestorBalanceGetPayload<{
+  select: typeof investorBalanceSelect
+}>
+
+
+export function mapInvestorBalanceSheet(
+  ibs:  InvestorBalanceSelect
+): InvestorBalancesDto {
+  return {
+    id: ibs.id ?? "",
+    investmentId: ibs.investmentId ?? "",
+    principalLocked: Number(ibs.principalLocked),
+    roiAccrued: Number(ibs.roiAccrued),
+    totalDeposited: Number(ibs.totalDeposited),
+    totalWithdrawn: Number(ibs.totalWithdrawn) ?? "",
+    availableBalance: Number(ibs.availableBalance) ?? "",
+    lastComputedAt: ibs.lastComputedAt,
+    createdAt: ibs.createdAt,
   }
 }

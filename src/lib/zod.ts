@@ -51,6 +51,7 @@ export const withdrawalFormSchema = z.object({
   amount: z.number().min(1, "Amount must be greater than 0"),
   earlyWithdrawal: z.boolean().default(false),
   reference: z.string().optional(),
+  investmentId: z.string(),
 });
 
 export const upgradeFormSchema = z.object({

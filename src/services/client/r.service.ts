@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { resolveServerAuth } from "@/lib/server/auth0-server";
 import { DashboardOverviewData, CategoryDto, BankDetails, ApiResponse, TransactionResponse, TransactionQueryParams, InvestmentDto } from "@/types/type"
-import { mapCategoryToDto, mapInvestmentToDto, mapInvestmentWithCategoryToDto, mapTransactionToAdminRow, mapTransactionToDto, mapUserProfileToDto, mapUserToDto } from '@/utils/mapper';
+import { mapCategoryToDto, mapInvestmentToDto, mapInvestmentWithCategoryToDto, mapTransactionToAdminRow, mapTransactionToDto, mapUserProfileToDto, mapUserToDto, mapInvestorBalanceSheet } from '@/utils/mapper';
 import { InvestmentStatus, Prisma, TransactionStatus, TransactionType } from "@prisma/client"
 
 async function authorizeUser(userId: string) {
@@ -58,6 +58,23 @@ export async function getDashboardOverview(
   } catch (err) {
     console.error("Investment query failed:", err);
     investments = [];
+  }
+
+
+  // ---------------------------
+  // 2️⃣.5️⃣ Aggregate balances from investments (FIX)
+  // ---------------------------
+  let aggregatedAvailableBalance = 0;
+  let aggregatedPrincipalLocked = 0;
+
+  for (const inv of investments) {
+    aggregatedAvailableBalance += Number(
+      inv.investorBalance?.availableBalance ?? 0
+    );
+
+    aggregatedPrincipalLocked += Number(
+      inv.investorBalance?.principalLocked ?? 0
+    );
   }
 
   // ---------------------------
@@ -168,8 +185,8 @@ export async function getDashboardOverview(
       totalDeposits: walletAgg.totalDeposited,
       totalWithdrawals: walletAgg.totalWithdrawn,
       totalInterest: walletAgg.roiAccrued,
-      availableBalance: Number(walletStats?.availableBalance ?? 0),
-      principalBalance: Number(walletStats?.principalLocked ?? 0),
+      availableBalance: aggregatedAvailableBalance,
+      principalBalance: aggregatedPrincipalLocked,
       pendingWithdrawals,
       pendingDeposits,
     },
@@ -345,7 +362,6 @@ export async function getProfile(userId: string) {
         investmentCategory: true
       }
     })
-    console.log(data)
 
     if (!data) {
       return {
@@ -368,3 +384,54 @@ export async function getProfile(userId: string) {
     }
   }
 }
+
+export async function getUserBalanceSheet(userId: string) {
+  try {
+
+    if (!userId) {
+      return {
+        success: false,
+        message: "UserId is required",
+        data: null
+      }
+    }
+
+    const data = await prisma.investorBalance.findMany({
+      where: {
+        userId
+      },
+      select: {
+        id: true,
+        investmentId: true,
+        principalLocked: true,
+        roiAccrued: true,
+        totalDeposited: true,
+        totalWithdrawn: true,
+        availableBalance: true,
+        lastComputedAt: true,
+        createdAt: true,
+      }
+    })
+
+    if (!data) {
+      return {
+        success: false,
+        message: "No Balnce found",
+        data: null
+      }
+    }
+
+    return {
+      success: true,
+      message: "Investor Balance Sheet",
+      data: data.map(mapInvestorBalanceSheet)
+    }
+  } catch (error: any) {
+    console.log(error.message)
+    return {
+      sucess: false,
+      message: error.massage
+    }
+  }
+}
+

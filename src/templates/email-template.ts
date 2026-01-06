@@ -1,4 +1,4 @@
-// /templates/email-template.ts
+import { config } from "@/lib/config";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { EmailUser, EmailTransactionDetail } from "@/types/notification.type";
 
@@ -25,7 +25,7 @@ const baseTemplate = (content: string): string => `
             background-color: #ffffff;
         }
         .header {
-            background-color: #1a365d;
+            background-color: #152333;
             color: white;
             padding: 30px 20px;
             text-align: center;
@@ -185,7 +185,7 @@ const baseTemplate = (content: string): string => `
 `;
 
 export const userDepositTemplate = (user: EmailUser, data: EmailTransactionDetail): string => {
-  const content = `
+    const content = `
     <div class="header">
         <h1>Deposit Request Received</h1>
         <p>Water Grove Investment Platform</p>
@@ -225,8 +225,7 @@ export const userDepositTemplate = (user: EmailUser, data: EmailTransactionDetai
         <p>If you have any questions, please contact our support team.</p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button">View Dashboard</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/support" class="button button-success" style="margin-left: 10px;">Contact Support</a>
+            <a href="${config.USER_URL}/transactions" class="button">View Deposit</a>
         </div>
         
         <p>Best regards,<br>The Water Grove Investment Team</p>
@@ -236,13 +235,13 @@ export const userDepositTemplate = (user: EmailUser, data: EmailTransactionDetai
         <p>This is an automated message, please do not reply to this email.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const adminDepositTemplate = (user: EmailUser, data: EmailTransactionDetail): string => {
-  const content = `
-    <div class="header" style="background-color: #e53e3e;">
+    const content = `
+    <div class="header" style="background-color: #152333;">
         <h1>New Deposit Request</h1>
         <p>Admin Alert - Action Required</p>
     </div>
@@ -289,8 +288,7 @@ export const adminDepositTemplate = (user: EmailUser, data: EmailTransactionDeta
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.ADMIN_URL || 'https://admin.watergrooveinvestment.com'}/transactions/${data.investmentId}" class="button button-success">Review Deposit</a>
-            <a href="${process.env.ADMIN_URL || 'https://admin.watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Admin Dashboard</a>
+            <a href="${config.ADMIN_URL}/deposits" class="button button-success">Review Deposit</a>
         </div>
         
         <p>Best regards,<br>Water Grove Admin System</p>
@@ -300,12 +298,12 @@ export const adminDepositTemplate = (user: EmailUser, data: EmailTransactionDeta
         <p>This notification was sent to administrators only.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const userWithdrawalTemplate = (user: EmailUser, data: EmailTransactionDetail): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #3182ce;">
         <h1>Withdrawal Request Received</h1>
         <p>Water Grove Investment Platform</p>
@@ -345,8 +343,7 @@ export const userWithdrawalTemplate = (user: EmailUser, data: EmailTransactionDe
         <p>You'll receive another notification once your withdrawal is approved and processed.</p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/withdrawals" class="button">Track Withdrawal</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/support" class="button button-success" style="margin-left: 10px;">Contact Support</a>
+            <a href="${config.USER_URL}/transactions" class="button">Track Withdrawal</a>
         </div>
         
         <p>Best regards,<br>The Water Grove Investment Team</p>
@@ -355,12 +352,12 @@ export const userWithdrawalTemplate = (user: EmailUser, data: EmailTransactionDe
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const adminWithdrawalTemplate = (user: EmailUser, data: EmailTransactionDetail): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #ed8936;">
         <h1>New Withdrawal Request</h1>
         <p>Admin Alert - Action Required</p>
@@ -404,8 +401,7 @@ export const adminWithdrawalTemplate = (user: EmailUser, data: EmailTransactionD
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.ADMIN_URL || 'https://admin.watergrooveinvestment.com'}/transactions/${data.investmentId}" class="button button-success">Review Withdrawal</a>
-            <a href="${process.env.ADMIN_URL || 'https://admin.watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Admin Dashboard</a>
+            <a href="${config.ADMIN_URL}/withdrawals" class="button button-success">Review Withdrawal</a>
         </div>
         
         <p>Best regards,<br>Water Grove Admin System</p>
@@ -414,12 +410,12 @@ export const adminWithdrawalTemplate = (user: EmailUser, data: EmailTransactionD
         <p>© ${new Date().getFullYear()} Water Grove Admin Dashboard</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const activateInvestmentTemplate = (user: EmailUser, data: EmailTransactionDetail): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #38a169;">
         <h1>Deposit Approved & Investment Activated!</h1>
         <p>Water Grove Investment Platform</p>
@@ -461,8 +457,7 @@ export const activateInvestmentTemplate = (user: EmailUser, data: EmailTransacti
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/investments" class="button button-success">View My Investments</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Go to Dashboard</a>
+            <a href="${config.USER_URL}investments" class="button button-success">View My Investments</a>
         </div>
         
         <p>Thank you for investing with us!</p>
@@ -472,12 +467,12 @@ export const activateInvestmentTemplate = (user: EmailUser, data: EmailTransacti
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const investmentActivatedTemplate = (user: EmailUser, data: EmailTransactionDetail): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #38a169;">
         <h1>Investment Activated Successfully!</h1>
         <p>Water Grove Investment Platform</p>
@@ -515,8 +510,7 @@ export const investmentActivatedTemplate = (user: EmailUser, data: EmailTransact
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/investments/${data.investmentId}" class="button button-success">View Investment Details</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Go to Dashboard</a>
+            <a href="${config.USER_URL}/investments" class="button button-success">View Investment Details</a>
         </div>
         
         <p>Best regards,<br>Your Water Grove Investment Team</p>
@@ -525,17 +519,17 @@ export const investmentActivatedTemplate = (user: EmailUser, data: EmailTransact
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const roiTemplate = (user: EmailUser, data: {
-  investmentId: string;
-  amount: number;
-  totalBalance: number;
-  date: string;
+    investmentId: string;
+    amount: number;
+    totalBalance: number;
+    date: string;
 }): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #20c997;">
         <h1>ROI Credited to Your Investment!</h1>
         <p>Water Grove Investment Platform</p>
@@ -573,8 +567,7 @@ export const roiTemplate = (user: EmailUser, data: {
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/investments/${data.investmentId}" class="button button-success">View Investment Details</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Go to Dashboard</a>
+            <a href="${config.USER_URL}/transactions" class="button button-success">View ROI Details</a>
         </div>
         
         <p>Happy Investing!</p>
@@ -584,20 +577,20 @@ export const roiTemplate = (user: EmailUser, data: {
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const investmentCompletedTemplate = (user: EmailUser, data: {
-  investmentId: string;
-  principalAmount: number;
-  totalReturns: number;
-  duration: string;
-  completionDate: string;
+    investmentId: string;
+    principalAmount: number;
+    totalReturns: number;
+    duration: string;
+    completionDate: string;
 }): string => {
-  const totalAmount = data.principalAmount + data.totalReturns;
-  
-  const content = `
+    const totalAmount = data.principalAmount + data.totalReturns;
+
+    const content = `
     <div class="header" style="background-color: #6f42c1;">
         <h1>Investment Completed Successfully!</h1>
         <p>Water Grove Investment Platform</p>
@@ -641,8 +634,7 @@ export const investmentCompletedTemplate = (user: EmailUser, data: {
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/investments" class="button button-success">View All Investments</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/withdraw" class="button" style="margin-left: 10px;">Make a Withdrawal</a>
+            <a href="${config.USER_URL}/investments" class="button button-success">View All Investments</a>
         </div>
         
         <p>Thank you for investing with us. We look forward to serving you again!</p>
@@ -652,12 +644,12 @@ export const investmentCompletedTemplate = (user: EmailUser, data: {
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const welcomeEmailTemplate = (user: EmailUser): string => {
-  const content = `
+    const content = `
     <div class="header">
         <h1>Welcome to Our Platform!</h1>
         <p>Water Grove Investment Platform</p>
@@ -679,8 +671,7 @@ export const welcomeEmailTemplate = (user: EmailUser): string => {
         <p>Here are some resources to help you get started:</p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button button-success">Go to Dashboard</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/faq" class="button" style="margin-left: 10px;">View FAQ</a>
+            <a href="${config.USER_URL}/dashboard" class="button button-success">Go to Dashboard</a>
         </div>
         
         <p>If you have any questions, our support team is here to help.</p>
@@ -691,15 +682,15 @@ export const welcomeEmailTemplate = (user: EmailUser): string => {
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const passwordResetTemplate = (user: EmailUser, data: {
-  resetLink: string;
-  expiryHours: number;
+    resetLink: string;
+    expiryHours: number;
 }): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #ed8936;">
         <h1>Password Reset Request</h1>
         <p>Water Grove Investment Platform</p>
@@ -730,23 +721,23 @@ export const passwordResetTemplate = (user: EmailUser, data: {
         <p style="font-size: 12px; color: #666;">If the button doesn't work, copy and paste this link: ${data.resetLink}</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const securityAlertTemplate = (user: EmailUser, data: {
-  alertType: string;
-  deviceInfo: string;
-  location: string;
-  timestamp: string;
+    alertType: string;
+    deviceInfo: string;
+    location: string;
+    timestamp: string;
 }): string => {
-  const alertMessages: Record<string, string> = {
-    login: 'New login detected on your account',
-    password_change: 'Your password was recently changed',
-    profile_update: 'Important changes were made to your profile',
-  };
+    const alertMessages: Record<string, string> = {
+        login: 'New login detected on your account',
+        password_change: 'Your password was recently changed',
+        profile_update: 'Important changes were made to your profile',
+    };
 
-  const content = `
+    const content = `
     <div class="header" style="background-color: #e53e3e;">
         <h1>Security Alert</h1>
         <p>Water Grove Investment Platform</p>
@@ -787,8 +778,7 @@ export const securityAlertTemplate = (user: EmailUser, data: {
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/security" class="button button-danger">Review Account Security</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/support" class="button" style="margin-left: 10px;">Contact Support</a>
+            <a href="${config.USER_URL}/settings" class="button button-danger">Review Account Security</a>
         </div>
         
         <p>Best regards,<br>Water Grove Security Team</p>
@@ -797,15 +787,15 @@ export const securityAlertTemplate = (user: EmailUser, data: {
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const rejectInvestmentDepositTemplate = (
-  user: EmailUser,
-  data: EmailTransactionDetail
+    user: EmailUser,
+    data: EmailTransactionDetail
 ): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #e53e3e;">
         <h1>Deposit Rejected</h1>
         <p>Water Grove Investment Platform</p>
@@ -848,8 +838,7 @@ export const rejectInvestmentDepositTemplate = (
         <p>If you believe this was a mistake or need further clarification, please contact our support team.</p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/support" class="button button-danger">Contact Support</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/deposit" class="button" style="margin-left: 10px;">Try Again</a>
+            <a href="${config.USER_URL}/support" class="button button-danger">Contact Support</a>
         </div>
         
         <p>Best regards,<br>Water Grove Support Team</p>
@@ -858,15 +847,15 @@ export const rejectInvestmentDepositTemplate = (
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const rejectWithdrawalTemplate = (
-  user: EmailUser,
-  data: EmailTransactionDetail
+    user: EmailUser,
+    data: EmailTransactionDetail
 ): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #e53e3e;">
         <h1>Withdrawal Request Rejected</h1>
         <p>Water Grove Investment Platform</p>
@@ -909,8 +898,7 @@ export const rejectWithdrawalTemplate = (
         <p>Please review your account details or reach out to support if you require further assistance.</p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/support" class="button button-danger">Contact Support</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Go to Dashboard</a>
+            <a href="${config.USER_URL}/support" class="button button-danger">Contact Support</a>
         </div>
         
         <p>Best regards,<br>Water Grove Support Team</p>
@@ -919,15 +907,15 @@ export const rejectWithdrawalTemplate = (
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 export const paidWithdrawalTemplate = (
-  user: EmailUser,
-  data: EmailTransactionDetail
+    user: EmailUser,
+    data: EmailTransactionDetail
 ): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #38a169;">
         <h1>Withdrawal Successfully Processed</h1>
         <p>Water Grove Investment Platform</p>
@@ -970,8 +958,7 @@ export const paidWithdrawalTemplate = (
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/transactions" class="button button-success">View Transactions</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Go to Dashboard</a>
+            <a href="${config.USER_URL}/transactions" class="button button-success">View Transactions</a>
         </div>
         
         <p>Thank you for investing with us.</p>
@@ -981,13 +968,13 @@ export const paidWithdrawalTemplate = (
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };
 
 // Additional template that might be used in the NotificationService
 export const accountVerifiedTemplate = (user: EmailUser): string => {
-  const content = `
+    const content = `
     <div class="header" style="background-color: #38a169;">
         <h1>Account Verified Successfully!</h1>
         <p>Water Grove Investment Platform</p>
@@ -1007,8 +994,7 @@ export const accountVerifiedTemplate = (user: EmailUser): string => {
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard/invest" class="button button-success">Start Investing Now</a>
-            <a href="${process.env.APP_URL || 'https://watergrooveinvestment.com'}/dashboard" class="button" style="margin-left: 10px;">Go to Dashboard</a>
+            <a href="${config.USER_URL} class="button button-success">Start Investing Now</a>
         </div>
         
         <p>Thank you for completing the verification process.</p>
@@ -1018,6 +1004,6 @@ export const accountVerifiedTemplate = (user: EmailUser): string => {
         <p>© ${new Date().getFullYear()} Water Grove Investment Platform. All rights reserved.</p>
     </div>
   `;
-  
-  return baseTemplate(content);
+
+    return baseTemplate(content);
 };

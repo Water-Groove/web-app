@@ -145,15 +145,18 @@ export async function withdrawaRequestAction(
     accountHolderName: formData.get("accountHolderName") as string,
     accountNumber: formData.get("accountNumber") as string,
     amount: Number(formData.get("amount")) as number,
-    earlyWithdrawal: Boolean(formData.get('earlyWithdrawal'))
+    earlyWithdrawal: Boolean(formData.get('earlyWithdrawal')),
+    investmentId: formData.get("investmentId") as string
   };
+
+  console.log(rawData)
 
   // Validate the data with schema
   const parsed = withdrawalFormSchema.safeParse(rawData);
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid withdrawal request data."
+      error: parsed.error.message || "Invalid withdrawal request data."
     };
   }
   // Simulate saving to DB or API

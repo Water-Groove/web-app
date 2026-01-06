@@ -115,6 +115,7 @@ export async function createDepositService({
 
       await tx.investorBalance.create({
         data: {
+          userId,
           investmentId: ivst.id,
           principalLocked: amount,
           createdAt: new Date(),
@@ -132,7 +133,7 @@ export async function createDepositService({
   } catch (error: any) {
     console.error(error)
     return {
-      success: true,
+      success: false,
       message: error.message || "Something went wrong",
     }
   }
@@ -194,19 +195,22 @@ export async function withdrawalRequestService({
   accountNumber,
   accountHolderName,
   amount,
-  earlyWithdrawal
+  earlyWithdrawal,
+  investmentId
 }: WithdrawalRequestDto): Promise<ApiResponse<null>> {
   const userId = await authorizeUser()
   try {
     const inst = await prisma.investment.findFirst({
-      where: { userId }
+      where: { id: investmentId, userId }
     });
 
     if (!inst) throw new Error("Investment not found");
 
-    const balance = await prisma.investorBalance.findUniqueOrThrow({
-      where: { investmentId: inst.id },
+    const balance = await prisma.investorBalance.findFirst({
+      where: { userId, investmentId },
     });
+
+    if(!balance) throw new Error("Investor balance not found")
 
     const available = Number(balance.availableBalance);
     const locked = Number(balance.principalLocked);
