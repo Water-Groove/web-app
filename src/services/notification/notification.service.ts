@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { sendNotification } from "@/lib/server/notification-api";
 import prisma from "@/lib/prisma";
 import {
