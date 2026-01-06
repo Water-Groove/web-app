@@ -3,6 +3,7 @@ import { resolveServerAuth } from "@/lib/server/auth0-server"
 import { ApiResponse, BankDetails, CreateDeposit, WithdrawalRequestDto } from "@/types/type"
 import { TransactionStatus, TransactionType } from "@prisma/client"
 import { getPlatformBankDetails } from "./r.service"
+import { notificationService } from "../notification/notification.service"
 
 async function authorizeUser() {
   const authUser = await resolveServerAuth()
@@ -114,6 +115,7 @@ export async function createDepositService({
 
       await tx.investorBalance.create({
         data: {
+          userId,
           investmentId: ivst.id,
           principalLocked: amount,
           createdAt: new Date(),
@@ -131,7 +133,7 @@ export async function createDepositService({
   } catch (error: any) {
     console.error(error)
     return {
-      success: true,
+      success: false,
       message: error.message || "Something went wrong",
     }
   }
@@ -178,6 +180,7 @@ export async function uploadDepositProofService(
     }
   })
 
+  await notificationService.sendDepositNotification({ userId, transactionId: txn?.id })
 
   return {
     success: true,
@@ -192,19 +195,22 @@ export async function withdrawalRequestService({
   accountNumber,
   accountHolderName,
   amount,
-  earlyWithdrawal
+  earlyWithdrawal,
+  investmentId
 }: WithdrawalRequestDto): Promise<ApiResponse<null>> {
   const userId = await authorizeUser()
   try {
     const inst = await prisma.investment.findFirst({
-      where: { userId }
+      where: { id: investmentId, userId }
     });
 
     if (!inst) throw new Error("Investment not found");
 
-    const balance = await prisma.investorBalance.findUniqueOrThrow({
-      where: { investmentId: inst.id },
+    const balance = await prisma.investorBalance.findFirst({
+      where: { userId, investmentId },
     });
+
+    if(!balance) throw new Error("Investor balance not found")
 
     const available = Number(balance.availableBalance);
     const locked = Number(balance.principalLocked);
@@ -237,6 +243,9 @@ export async function withdrawalRequestService({
         bankName: String(bankName),
       },
     });
+
+    await notificationService.sendWithdrawalNotification({ userId, transactionId: txn?.id })
+
 
     return {
       success: true,

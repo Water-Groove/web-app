@@ -39,7 +39,7 @@ import {
   AdminInvestmentRow,
   AdminInvestmentQueryParams,
   PaginatedResponse,
-} from "@/types/adminType";
+} from "@/types/admin.type";
 import { InvestmentStatus, Prisma } from "@prisma/client";
 import InvestmentTable from "@/components/investment/InvestmentTable";
 import InvestmentDetailsModal from "@/components/investment/InvestmentDetailsModal";

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Suspense } from "react";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import DashboardClient from "./_components/DashboardClient";
@@ -6,6 +5,7 @@ import { Metadata } from "next";
 import {
   getAllInvestmentCategory,
   getDashboardOverview,
+  getUserBalanceSheet,
 } from "@/services/client/r.service";
 import { resolveServerAuth } from "@/lib/server/auth0-server";
 import { DashboardOverviewData } from "@/types/type";
@@ -44,6 +44,7 @@ export default async function DashboardPage() {
     // Fetch dashboard data
     const dashboardData = await getDashboardOverview(user?.id);
     const investmemtCategoeies = await getAllInvestmentCategory();
+    const investmentsBalance = await getUserBalanceSheet(user?.id);
 
     // Format and validate data
     const formattedData = formatDashboardData(dashboardData, user);
@@ -53,6 +54,7 @@ export default async function DashboardPage() {
         <DashboardClient
           data={formattedData}
           categories={investmemtCategoeies.data ?? []}
+          investmentsBalance={investmentsBalance.data ?? []}
         />
       </Suspense>
     );

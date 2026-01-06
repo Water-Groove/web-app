@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma"
 import { Prisma, TransactionStatus, TransactionType } from "@prisma/client"
-import { AdminDashboardOverview, AdminUserQueryParams, AdminUserRow, AdminInvestmentQueryParams, AdminInvestmentRow, AdminTransactionQueryParams, AdminTransactionRow, PaginatedResponse, AdminPenaltiesQueryParams, AdminPenaltyRow } from "@/types/adminType"
+import { AdminDashboardOverview, AdminUserQueryParams, AdminUserRow, AdminInvestmentQueryParams, AdminInvestmentRow, AdminTransactionQueryParams, AdminTransactionRow, PaginatedResponse, AdminPenaltiesQueryParams, AdminPenaltyRow } from "@/types/admin.type"
 import { ApiResponse } from "@/types/type"
 import { buildDateFilter, buildOrder, buildPaginationMeta, paginate } from "@/lib/utils"
 import { resolveServerAuth } from "@/lib/server/auth0-server"

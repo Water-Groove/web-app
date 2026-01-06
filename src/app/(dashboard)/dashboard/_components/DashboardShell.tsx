@@ -9,7 +9,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { dashboardNavItems } from "@/config/navigations";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { AuthData, Auth0User } from "@/types/type";
-import { NavLinks } from "@/types/nav";
+import { NavLinks } from "@/types/nav.type";
 
 interface Props {
   children: React.ReactNode;

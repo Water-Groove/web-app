@@ -38,7 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { StatsCard } from "@/components/ui/StatsCard";
 import { Search, Filter, MoreVertical, Eye, UserX, UserCheck, Calendar } from "lucide-react";
-import { AdminUserRow, AdminUserQueryParams, PaginatedResponse } from "@/types/adminType";
+import { AdminUserRow, AdminUserQueryParams, PaginatedResponse } from "@/types/admin.type";
 import { ApiResponse } from "@/types/type";
 
 interface UsersClientProps {

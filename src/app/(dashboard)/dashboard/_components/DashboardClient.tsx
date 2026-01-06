@@ -28,7 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CategoryDto, DashboardOverviewData } from "@/types/type";
+import { CategoryDto, DashboardOverviewData, InvestorBalancesDto } from "@/types/type";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { OverviewItem } from "@/components/ui/overview-Item";
 import Link from "next/link";
@@ -41,6 +41,7 @@ import { UpgradeTierModal } from "@/components/modals/upgrade-tier-modal";
 interface DashboardClientProps {
   data: DashboardOverviewData;
   categories: CategoryDto[] | [];
+  investmentsBalance: InvestorBalancesDto[] | []
 }
 
 const formatTier = (tier?: string) => {
@@ -51,6 +52,7 @@ const formatTier = (tier?: string) => {
 export default function DashboardClient({
   data,
   categories,
+  investmentsBalance
 }: DashboardClientProps) {
   const [viewBalance, setViewBalance] = useState<boolean>(false);
   const [showDepositModal, setShowDepositModal] = useState<boolean>(false);
@@ -496,6 +498,7 @@ export default function DashboardClient({
         onClose={() => setShowWithdrawalModal(false)}
         availableBalance={wallet.availableBalance}
         principalLocked={wallet.principalBalance}
+        investmentsBalance={investmentsBalance}
       />
 
       {category?.code && (

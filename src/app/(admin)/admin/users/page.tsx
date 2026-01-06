@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { resolveServerAuth } from "@/lib/server/auth0-server";
 import { getAllUsers } from "@/services/admin/r.service";
-import { AdminUserQueryParams } from "@/types/adminType";
+import { AdminUserQueryParams } from "@/types/admin.type";
 import UsersClient from "../_components/UsersCleint";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

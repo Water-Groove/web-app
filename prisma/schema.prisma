@@ -65,6 +65,7 @@ model User {
 
   investments  Investment[]
   transactions Transaction[]
+  balanceSheet InvestorBalance[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,9 +132,9 @@ model Investment {
 
   principalAmount Decimal @db.Decimal(15, 2)
 
-  roiRateSnapshot Decimal @db.Decimal(5, 2)
-  durationMonths  Int
-  lastRoiPeriodPaid Int @default(0)
+  roiRateSnapshot   Decimal @db.Decimal(5, 2)
+  durationMonths    Int
+  lastRoiPeriodPaid Int     @default(0)
 
   status InvestmentStatus @default(PENDING_PAYMENT)
 
@@ -156,6 +157,9 @@ model Investment {
 
 model InvestorBalance {
   id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
 
   investmentId String     @unique
   investment   Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
@@ -262,6 +266,6 @@ model PlatformBankAccount {
 }
 
 model CronLock {
-  name String @id
+  name     String   @id
   lockedAt DateTime
 }

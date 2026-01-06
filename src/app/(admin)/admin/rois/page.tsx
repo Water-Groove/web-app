@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { resolveServerAuth } from "@/lib/server/auth0-server";
-import { AdminTransactionQueryParams } from "@/types/adminType";
+import { AdminTransactionQueryParams } from "@/types/admin.type";
 import { TransactionStatus, TransactionType } from "@prisma/client";
 import { getTransactions } from "@/services/admin/r.service";
 import { Card, CardContent } from "@/components/ui/card";

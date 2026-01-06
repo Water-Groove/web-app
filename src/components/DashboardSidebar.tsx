@@ -11,7 +11,7 @@ import {
 import clsx from "clsx";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Skeleton } from "./ui/skeleton";
-import { NavLinks } from "@/types/nav";
+import { NavLinks } from "@/types/nav.type";
 import { useRouter } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import Image from "next/image";
@@ -111,7 +111,7 @@ export function DashboardSidebar({
             const Icon = item.icon;
 
             return (
-              <>
+              <div key={item.href}>
                 {item.title === "Support" ? (
                   <Button
                     key={item.href}
@@ -145,7 +145,7 @@ export function DashboardSidebar({
                     <span className="font-medium">{item.title}</span>
                   </Link>
                 )}
-              </>
+              </div>
             );
           })}
         </nav>

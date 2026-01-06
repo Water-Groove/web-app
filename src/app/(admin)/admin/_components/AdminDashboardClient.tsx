@@ -12,7 +12,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { AdminDashboardOverview } from "@/types/adminType";
+import { AdminDashboardOverview } from "@/types/admin.type";
 import { StatsCard } from "@/components/ui/StatsCard";
 
 // Custom Tooltip for charts

@@ -1,13 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import { Admin, Investment, InvestorBalance, InvestmentCategory, PlatformBankAccount, Transaction, User } from "@prisma/client"
 import { Prisma } from "@prisma/client"
-import { AdminDto, BankDetails, InvestmenCrontDto, InvestorBalanceDto, CategoryDto, InvestmentDto, InvestmentWithCategoryDto, TransactionDto, UserDto, UserProfileSettings } from "@/types/type"
+import { AdminDto, BankDetails, InvestmenCrontDto, InvestorBalanceDto, CategoryDto, InvestmentDto, InvestmentWithCategoryDto, TransactionDto, UserDto, UserProfileSettings, InvestorBalancesDto } from "@/types/type"
 import {
   AdminTransactionRow,
   AdminInvestmentRow,
   AdminUserRow,
   AdminPenaltyRow
-} from "@/types/adminType"
+} from "@/types/admin.type"
+import { EmailTransactionDetail } from "@/types/notification.type";
+
 
 export const decimalToNumber = (
   value?: Prisma.Decimal | null
@@ -330,5 +332,69 @@ export function mapPeneltyToAdminRow(
     amount: Number(penalty.amount),
     reason: penalty.reason ?? "",
     createdAt: penalty.createdAt
+  }
+}
+
+const trasactionSelect = {
+  id: true,
+  investmentId: true,
+  type: true,
+  status: true,
+  amount: true,
+  description: true,
+  processedByAdminId: true,
+  processedAt: true,
+  createdAt: true,
+}
+type TransactionSelectNoti = Prisma.TransactionGetPayload<{
+  select: typeof trasactionSelect
+}>
+
+export function mapTransactionToEmailDetail(
+  txn:  TransactionSelectNoti
+): EmailTransactionDetail {
+  return {
+    id: txn.id,
+    investmentId: txn.investmentId ?? "",
+    type: txn.type,
+    status: txn.status,
+    amount: Number(txn.amount),
+    description: txn.description ?? "",
+    processedByAdminId: txn.processedByAdminId ?? "",
+    processedAt: txn.processedAt,
+    createdAt: txn.createdAt,
+  }
+}
+
+
+const investorBalanceSelect = {
+  id: true,
+  investmentId: true,
+  principalLocked: true,
+  roiAccrued: true,
+  totalDeposited: true,
+  totalWithdrawn: true,
+  availableBalance: true,
+  lastComputedAt: true,
+  createdAt: true,
+}
+type InvestorBalanceSelect = Prisma.InvestorBalanceGetPayload<{
+  select: typeof investorBalanceSelect
+}>
+
+
+export function mapInvestorBalanceSheet(
+  ibs:  InvestorBalanceSelect
+): InvestorBalancesDto {
+  return {
+    id: ibs.id ?? "",
+    investmentId: ibs.investmentId ?? "",
+    principalLocked: Number(ibs.principalLocked),
+    roiAccrued: Number(ibs.roiAccrued),
+    totalDeposited: Number(ibs.totalDeposited),
+    totalWithdrawn: Number(ibs.totalWithdrawn) ?? "",
+    availableBalance: Number(ibs.availableBalance) ?? "",
+    lastComputedAt: ibs.lastComputedAt,
+    createdAt: ibs.createdAt,
   }
 }

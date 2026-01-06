@@ -1,5 +1,5 @@
-import { InvestorTier, TransactionStatus, TransactionType, AdminRole, InvestmentStatus } from "@prisma/client"
-import { AdminTransactionRow } from "./adminType"
+import { InvestorTier, TransactionStatus, TransactionType, AdminRole, InvestmentStatus, Prisma } from "@prisma/client"
+import { AdminTransactionRow } from "./admin.type"
 import build from "next/dist/build"
 
 export enum InvestmentStatusDto {
@@ -247,6 +247,19 @@ export interface WithdrawalRequestDto {
   amount: number
   reference?: string
   earlyWithdrawal?: boolean
+  investmentId: string
+}
+
+export interface InvestorBalancesDto {
+  id: string,
+  investmentId: string,
+  principalLocked: number,
+  roiAccrued: number,
+  totalDeposited: number,
+  totalWithdrawn: number,
+  availableBalance: number,
+  lastComputedAt: Date,
+  createdAt: Date,
 }
 
 // ==============================
