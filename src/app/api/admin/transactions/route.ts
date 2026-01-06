@@ -1,7 +1,7 @@
 import { TransactionStatus, TransactionType } from '@prisma/client';
 import { NextResponse } from "next/server";
 import { resolveServerAuth } from '@/lib/server/auth0-server';
-import { AdminTransactionQueryParams } from '@/types/adminType';
+import { AdminTransactionQueryParams } from '@/types/admin.type';
 import { getTransactions } from '@/services/admin/r.service';
 import { approveDeposit } from '@/services/admin/cud.service';
 

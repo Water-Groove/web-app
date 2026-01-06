@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SupportTicket, SupportTicketQueryParams } from '@/types/support';
+import { SupportTicket, SupportTicketQueryParams } from '@/types/support.type';
 import { ApiResponse, PaginatedResponse } from '@/types/type';
 
 export const getSupportTickets = async (

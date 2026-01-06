@@ -1,4 +1,4 @@
-import { NavLinks } from "@/types/nav";
+import { NavLinks } from "@/types/nav.type";
 import { FileText, Shield, HelpCircle } from "lucide-react";
 
 export const legalNavItems: NavLinks[] = [

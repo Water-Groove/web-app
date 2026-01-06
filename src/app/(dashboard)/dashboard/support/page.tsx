@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { resolveServerAuth } from '@/lib/server/auth0-server';
 import SupportClient from '../_components/SupportClient';
 import { getSupportTickets } from '@/services/client/support.service';
-import { SupportTicketStatus, SupportTicketPriority } from '@/types/support';
+import { SupportTicketStatus, SupportTicketPriority } from '@/types/support.type';
 
 export const metadata: Metadata = {
   title: "Support | Water Grove",

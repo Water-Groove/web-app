@@ -27,7 +27,7 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react";
-import { AdminInvestmentRow } from "@/types/adminType";
+import { AdminInvestmentRow } from "@/types/admin.type";
 import { InvestmentStatus } from "@prisma/client";
 import { formatCurrency, formatDate } from "@/lib/utils";
 

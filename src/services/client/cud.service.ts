@@ -3,6 +3,7 @@ import { resolveServerAuth } from "@/lib/server/auth0-server"
 import { ApiResponse, BankDetails, CreateDeposit, WithdrawalRequestDto } from "@/types/type"
 import { TransactionStatus, TransactionType } from "@prisma/client"
 import { getPlatformBankDetails } from "./r.service"
+import { notificationService } from "../notification/notification.service"
 
 async function authorizeUser() {
   const authUser = await resolveServerAuth()
@@ -178,6 +179,7 @@ export async function uploadDepositProofService(
     }
   })
 
+  await notificationService.sendDepositNotification({ userId, transactionId: txn?.id })
 
   return {
     success: true,
@@ -237,6 +239,9 @@ export async function withdrawalRequestService({
         bankName: String(bankName),
       },
     });
+
+    await notificationService.sendWithdrawalNotification({ userId, transactionId: txn?.id })
+
 
     return {
       success: true,

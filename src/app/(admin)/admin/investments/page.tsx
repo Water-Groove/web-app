@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { resolveServerAuth } from "@/lib/server/auth0-server";
 import { getAllInvestments } from "@/services/admin/r.service";
 import InvestmentClient from "../_components/InvestmentClient";
-import { AdminInvestmentQueryParams } from "@/types/adminType";
+import { AdminInvestmentQueryParams } from "@/types/admin.type";
 import { InvestmentStatus } from "@prisma/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";

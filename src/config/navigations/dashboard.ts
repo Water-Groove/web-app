@@ -1,4 +1,4 @@
-import { NavLinks } from "@/types/nav";
+import { NavLinks } from "@/types/nav.type";
 import { Home, Activity, CreditCard, Wallet, Star, User } from "lucide-react";
 
 export const dashboardNavItems: NavLinks[] = [

@@ -38,7 +38,7 @@ import {
   AdminTransactionRow,
   AdminTransactionQueryParams,
   PaginatedResponse,
-} from "@/types/adminType";
+} from "@/types/admin.type";
 import { TransactionStatus } from "@prisma/client";
 import TransactionTable from "@/components/transaction/TransactionTable";
 import TransactionDetailsModal from "@/components/transaction/TransactionDetailsModal";

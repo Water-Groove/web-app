@@ -1,4 +1,4 @@
-import { NavLinks } from "@/types/nav";
+import { NavLinks } from "@/types/nav.type";
 
 export const authNavItems: NavLinks[] = [
   {

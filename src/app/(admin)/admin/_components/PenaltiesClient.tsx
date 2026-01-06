@@ -30,7 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { StatsCard } from "@/components/ui/StatsCard";
 import { Search, Filter, AlertTriangle, DollarSign, Percent, Calendar } from "lucide-react";
-import { AdminPenaltyRow, AdminPenaltiesQueryParams } from "@/types/adminType";
+import { AdminPenaltyRow, AdminPenaltiesQueryParams } from "@/types/admin.type";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 interface PenaltiesClientProps {
