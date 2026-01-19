@@ -370,13 +370,6 @@ const HomeClient = () => {
       {/* CTA Section */}
       <CTASection />
 
-      {/* Floating action button for quick access */}
-      <Link href="/register" className="fixed bottom-6 right-6 z-50">
-        <Button className="bg-wg-secondary hover:bg-wg-secondary/90 text-wg-primary font-bold px-6 py-6 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 group">
-          <Wallet className="h-5 w-5" />
-          <span className="ml-2 hidden sm:inline">Invest Now</span>
-        </Button>
-      </Link>
     </div>
   );
 };
