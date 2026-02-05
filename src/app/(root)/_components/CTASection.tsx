@@ -47,7 +47,7 @@ const CTASection = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link href="/register">
+            <Link href="/api/auth/login">
               <Button size="lg" className="bg-wg-secondary hover:bg-wg-secondary/90 text-wg-primary font-bold px-8 py-6 text-base rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 Start Investing Today <ArrowRight className="ml-2 h-5 w-5" />
               </Button>

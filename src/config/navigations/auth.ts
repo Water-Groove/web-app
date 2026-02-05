@@ -7,7 +7,7 @@ export const authNavItems: NavLinks[] = [
   },
   {
     title: "Get Started",
-    href: "/auth/register",
+    href: "/api/auth/login",
     variant: "primary",
   },
 ];
