@@ -277,7 +277,7 @@ const InvestmentSectors: React.FC<InvestmentSectorsProps> = ({ sectors }) => {
               </p>
             </div>
             
-            <Link href="/register">
+            <Link href="/login">
               <Button className="bg-wg-secondary hover:bg-wg-secondary/90 text-wg-primary font-bold px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">
                 Begin Investing
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />

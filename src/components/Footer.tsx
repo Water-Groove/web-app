@@ -198,7 +198,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-wg-primary/80">
               <li>
                 <Link 
-                  href="/register" 
+                  href="/login" 
                   className="hover:text-wg-accent transition-colors flex items-center gap-2 group"
                 >
                   <CheckCircle className="h-3 w-3 text-wg-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
